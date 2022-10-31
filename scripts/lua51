@@ -1,0 +1,4 @@
+#! /usr/bin/env bash
+
+# assuming luac --version is lua 5.1
+$HOME/Documents/lua-5.1.5/src/luac -o - $1
