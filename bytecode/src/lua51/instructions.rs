@@ -10,6 +10,29 @@ pub enum Value {
 	sBx(i32),
 }
 
+impl Value {
+	pub fn get_rk(&self) -> Value {
+		match self {
+			Value::RK(val) => {
+				if *val > 0xff {
+					Self::Kst(val - 0x100)
+				} else {
+					Self::Reg(*val as u8)
+				}
+			}
+			_ => panic!("does not have RK value"),
+		}
+	}
+
+	pub fn set_constant(&mut self, kst: usize) {
+		match self {
+			Value::RK(val) => *val = kst as u32 + 0x100,
+			Value::Kst(val) => *val = kst as u32,
+			_ => panic!("does not have RK value"),
+		}
+	}
+}
+
 #[derive(Debug, Clone, Copy)]
 pub enum Opcode {
 	iABC(Option<Value>, Option<Value>, Option<Value>),
