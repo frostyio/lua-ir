@@ -16,7 +16,7 @@ pub struct Edge(Option<String>, String, String); // label, instance -> instance
 
 impl Display for Edge {
 	fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-		write!(f, "{} -> {}", self.1, self.2);
+		write!(f, "{} -> {}", self.1, self.2)?;
 		if let Some(label) = &self.0 {
 			write!(f, " [ label = \"{}\" ];", label)
 		} else {
@@ -70,7 +70,7 @@ impl Digraph {
 			indegrees.insert(&edge.2, indegrees.get(&edge.2).unwrap_or(&0) + 1);
 		}
 
-		indegrees.retain(|k, v| *v == n);
+		indegrees.retain(|_, v| *v == n);
 
 		indegrees
 			.into_iter()
@@ -81,14 +81,14 @@ impl Digraph {
 
 impl Display for Digraph {
 	fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-		write!(f, "digraph G {{\n");
+		write!(f, "digraph G {{\n")?;
 		self.instances.iter().for_each(|(name, inst)| {
-			write!(f, "\t{} {}\n", name, inst);
+			let _ = write!(f, "\t{} {}\n", name, inst);
 		});
 		self.edges.iter().for_each(|edge| {
-			write!(f, "\t{}\n", edge);
+			let _ = write!(f, "\t{}\n", edge);
 		});
-		write!(f, "}}");
+		write!(f, "}}")?;
 
 		write!(f, "\n")
 	}
