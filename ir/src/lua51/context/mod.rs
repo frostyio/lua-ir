@@ -1,3 +1,5 @@
+use std::fmt::Display;
+
 use crate::traits::{Context, IROperand};
 use bytecode::lua51::{instructions::Value, Proto};
 
@@ -125,5 +127,31 @@ impl Context for IRContext {
 				inst.modify(operand);
 			}
 		}
+	}
+}
+
+/* display */
+
+/// Mimics the luac -l stdout
+impl Display for IRContext {
+	fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+		write!(
+			f,
+			"{} ({} instructions)\n",
+			self.source,
+			self.instructions.get_all().len()
+		)?;
+		write!(
+			f,
+			"{} params, {} upvalues, {} constants, {} functions\n",
+			self.nparams,
+			self.nupvalues,
+			self.constants.get_all().len(),
+			self.closures.len()
+		)?;
+		for (pc, inst) in self.instructions.iter().enumerate() {
+			write!(f, "\t{}\t{}\t\n", pc, inst)?; // i could do 1 based indexing but that stinks
+		}
+		write!(f, "\n")
 	}
 }

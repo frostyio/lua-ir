@@ -45,7 +45,10 @@ mod tests {
 		let idx = context.constants.add_string("fake ok!");
 		println!("new constants: {:?}", context.constants.get_all());
 
+		// TODO: does not seem to remap
 		context.remap_constant(ok_idx, idx);
+
+		println!("{}", context);
 
 		// let kst_insts = context.get_constant_instructions();
 		// println!("abc: {:?}", kst_insts);

@@ -2,12 +2,25 @@
 
 /* definitions */
 
+use std::fmt::Display;
+
 #[derive(Debug, Clone, Copy, PartialEq)]
 pub enum Value {
 	Reg(u8),
 	Kst(u32),
 	RK(u32),
 	sBx(i32),
+}
+
+impl Display for Value {
+	fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+		match self {
+			Self::Reg(v) => write!(f, "{v}"),
+			Self::Kst(v) => write!(f, "{v}"),
+			Self::RK(v) => write!(f, "{v}"),
+			Self::sBx(v) => write!(f, "{v}"),
+		}
+	}
 }
 
 impl Value {
@@ -40,6 +53,23 @@ pub enum Opcode {
 	iABx(Option<Value>, Option<Value>),
 	iAsBx(Option<Value>, Option<Value>),
 	isBx(Option<Value>),
+}
+
+impl Display for Opcode {
+	fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+		let mut operands = vec![];
+		if let Some(op) = self.get_a() {
+			operands.push(op.to_string());
+		}
+		if let Some(op) = self.get_b().or(*self.get_bx()).or(*self.get_sbx()) {
+			operands.push(op.to_string());
+		}
+		if let Some(op) = self.get_c() {
+			operands.push(op.to_string());
+		}
+		let operands_str: String = operands.iter().map(|id| id.to_string() + " ").collect();
+		write!(f, "{}", &operands_str[0..operands_str.len() - 1])
+	}
 }
 
 #[derive(Debug, Clone, Copy)]
@@ -270,21 +300,21 @@ impl Opcode {
 			Opcode::iABC(a, _, _) => a,
 			Opcode::iABx(a, _) => a,
 			Opcode::iAsBx(a, _) => a,
-			_ => unreachable!(),
+			_ => &None,
 		}
 	}
 
 	pub fn get_b(&self) -> &Option<Value> {
 		match &self {
 			Opcode::iABC(_, b, _) => b,
-			_ => unreachable!(),
+			_ => &None,
 		}
 	}
 
 	pub fn get_bx(&self) -> &Option<Value> {
 		match &self {
 			Opcode::iABx(_, bx) => bx,
-			_ => unreachable!(),
+			_ => &None,
 		}
 	}
 
@@ -292,14 +322,14 @@ impl Opcode {
 		match &self {
 			Opcode::iAsBx(_, sbx) => sbx,
 			Opcode::isBx(sbx) => sbx,
-			_ => unreachable!(),
+			_ => &None,
 		}
 	}
 
 	pub fn get_c(&self) -> &Option<Value> {
 		match &self {
 			Opcode::iABC(_, _, c) => c,
-			_ => unreachable!(),
+			_ => &None,
 		}
 	}
 }

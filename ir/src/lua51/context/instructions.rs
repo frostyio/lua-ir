@@ -1,5 +1,7 @@
+use super::super::get_opcode_name;
 use crate::traits::{IROperand, Operand};
 use bytecode::lua51::instructions::{Instruction, Opcode, Value};
+use std::fmt::Display;
 
 impl IROperand<Value> {
 	pub fn get_kst(&self) -> Option<usize> {
@@ -20,6 +22,16 @@ impl IROperand<Value> {
 pub struct IRInstruction {
 	opcode: usize,
 	val: Opcode,
+}
+
+impl Display for IRInstruction {
+	fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+		if let Some(name) = get_opcode_name(self.opcode) {
+			write!(f, "{name:<10}\t{:<10}", self.val)
+		} else {
+			write!(f, "UNKNOWN\t{:<10}", self.val)
+		}
+	}
 }
 
 impl IRInstruction {
@@ -176,6 +188,10 @@ impl IRInstructions {
 				.map(|inst| IRInstruction::from_instruction(inst))
 				.collect(),
 		}
+	}
+
+	pub fn get_all(&self) -> &Vec<IRInstruction> {
+		&self.instructions
 	}
 
 	pub fn get(&self, idx: usize) -> Option<&IRInstruction> {
